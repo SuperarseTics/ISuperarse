@@ -86,7 +86,7 @@
         }
 
         a {
-            color: #005D52
+            color: #005D52;
             text-decoration: none;
             font-weight: bold;
         }
@@ -104,6 +104,39 @@
                 font-size: 1em;
             }
         }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.7);
+        }
+
+        .modal-content {
+            background-color: #fff;
+            margin: 10% auto;
+            padding: 20px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            color: #000;
+            position: relative;
+        }
+
+        .close {
+            color: #aaa;
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 24px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -117,7 +150,7 @@
         <p>Para iniciar, completa tu registro y únete al grupo oficial de WhatsApp, donde compartiremos información clave durante el programa.</p>
 
         <h2>Buscar por cédula</h2>
-        <form method="POST">
+        <form id="buscar-form">
             <label for="cedula">Cédula:</label>
             <input type="text" name="cedula" id="cedula" required>
             <input type="submit" name="buscar" value="Buscar">
@@ -128,74 +161,42 @@
         <p>¿Tienes inconvenientes? Contáctanos: <a href="https://wa.me/593992531588">0992531588</a> o <a href="mailto:ingles@superarse.edu.ec">ingles@superarse.edu.ec</a></p>
     </div>
 
-    <?php
-    include "conexion.php";
+    <!-- Modal -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div id="modal-body"></div>
+        </div>
+    </div>
 
-    if (isset($_POST['buscar'])) {
-        $cedula = $_POST['cedula'];
-        $sql = "SELECT * FROM usuarios WHERE cedula='$cedula'";
-        $res = $conexion->query($sql);
-        if ($res->num_rows > 0) {
-            $row = $res->fetch_assoc();
-            ?>
-            <div class="container">
-                <form action="procesar.php" method="POST">
-                    <input type="hidden" name="cedula" value="<?= $row['cedula'] ?>">
-                    <label>Nombres:</label>
-                    <input type="text" name="nombres" value="<?= $row['nombres'] ?>" readonly>
+    <script>
+    document.getElementById("buscar-form").addEventListener("submit", function(e) {
+        e.preventDefault();
+        const cedula = document.getElementById("cedula").value;
 
-                    <label>Apellidos:</label>
-                    <input type="text" name="apellidos" value="<?= $row['apellidos'] ?>" readonly>
+        fetch("buscar.php", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: "cedula=" + encodeURIComponent(cedula)
+        })
+        .then(response => response.text())
+        .then(html => {
+            if (html.includes("modal-form-content")) {
+                document.getElementById("modal-body").innerHTML = html;
+                document.getElementById("modal").style.display = "block";
+            } else {
+                document.body.innerHTML = html; // Redirige si es necesario
+            }
+        });
+    });
 
-                    <label>Correo:</label>
-                    <input type="email" name="correo" value="<?= $row['correo'] ?>" readonly>
-
-                    <label>Ciudad:</label>
-                    <input type="text" name="ciudad" required>
-
-                    <label>Provincia:</label>
-                    <select name="provincia" required>
-                        <option value="">Seleccione una provincia</option>
-                        <option>Azuay</option>
-                        <option>Bolívar</option>
-                        <option>Cañar</option>
-                        <option>Carchi</option>
-                        <option>Chimborazo</option>
-                        <option>Cotopaxi</option>
-                        <option>El Oro</option>
-                        <option>Esmeraldas</option>
-                        <option>Galápagos</option>
-                        <option>Guayas</option>
-                        <option>Imbabura</option>
-                        <option>Loja</option>
-                        <option>Los Ríos</option>
-                        <option>Manabí</option>
-                        <option>Morona Santiago</option>
-                        <option>Napo</option>
-                        <option>Orellana</option>
-                        <option>Pastaza</option>
-                        <option>Pichincha</option>
-                        <option>Santa Elena</option>
-                        <option>Santo Domingo de los Tsáchilas</option>
-                        <option>Sucumbíos</option>
-                        <option>Tungurahua</option>
-                        <option>Zamora Chinchipe</option>
-                    </select>
-
-                    <input type="submit" value="Guardar">
-                </form>
-            </div>
-            <?php
-        } else {
-            echo "<script>
-                if (confirm('Usted no está registrado con el Instituto Superarse. ¿Desea contactar a SENESCYT?')) {
-                    window.location.href = 'https://siau.senescyt.gob.ec/because-he-is-nice/';
-                } else {
-                    window.location.href = 'index.php';
-                }
-            </script>";
+    // Cerrar el modal
+    document.addEventListener("click", function(e) {
+        if (e.target.matches(".close") || e.target.matches(".modal")) {
+            document.getElementById("modal").style.display = "none";
         }
-    }
-    ?>
+    });
+    </script>
+
 </body>
 </html>
