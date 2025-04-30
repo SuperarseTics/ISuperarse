@@ -100,12 +100,16 @@ $moodle = $conexion->query("SELECT id FROM links_moodle WHERE id NOT IN (SELECT 
             if ($conexion->query($sql) === TRUE) {
                 $whatsapp_link = $conexion->query("SELECT enlace FROM links_whatsapp WHERE id={$whatsapp['id']}")->fetch_assoc()['enlace'];
                 $moodle_link = $conexion->query("SELECT enlace FROM links_moodle WHERE id={$moodle['id']}")->fetch_assoc()['enlace'];
+                $grupo_result = $conexion->query("SELECT grupo FROM usuarios WHERE cedula='$cedula'");
+                $grupo_row = $grupo_result->fetch_assoc();
+                $grupo = $grupo_row['grupo'];
 
                 echo "<h2>¡Registro completado exitosamente!</h2>";
                 echo "<p><a href='$whatsapp_link' target='_blank'>Entrar al grupo de WhatsApp</a></p>";
                 echo "<p>Tu usuario para ingresar al Aula Virtual es: <strong>$cedula</strong></p>";
                 echo "<p>Tu contraseña temporal es: <strong>Superarse.2025</strong></p>";
                 echo "<p><em>Recuerda cambiar tu contraseña en tu primer inicio de sesión.</em></p>";
+                echo "<p>Tu grupo es: <strong>$grupo</strong></p>";
                 echo "<p><a href='$moodle_link' target='_blank'>Entrar a Moodle</a></p>";
                 echo "<p>Para más información visita nuestra página web: 
                       <a href='https://superarse.edu.ec/' target='_blank'>Instituto Superarse</a></p>";
