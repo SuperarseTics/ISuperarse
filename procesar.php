@@ -9,15 +9,17 @@ $provincia = $_POST['provincia'];
 $usuario = $conexion->query("SELECT link_whatsapp_id, link_moodle_id FROM usuarios WHERE cedula = '$cedula'")->fetch_assoc();
 
 if ($usuario && $usuario['link_whatsapp_id'] && $usuario['link_moodle_id']) {
-    // 2. Actualiza solo ciudad y provincia
     $conexion->query("UPDATE usuarios SET ciudad='$ciudad', provincia='$provincia' WHERE cedula='$cedula'");
 
-    // 3. Trae los enlaces
     $whatsapp_link = $conexion->query("SELECT enlace FROM links_whatsapp WHERE id={$usuario['link_whatsapp_id']}")->fetch_assoc()['enlace'];
     $moodle_link = $conexion->query("SELECT enlace FROM links_moodle WHERE id={$usuario['link_moodle_id']}")->fetch_assoc()['enlace'];
-    $grupo_result = $conexion->query("SELECT grupo FROM usuarios WHERE cedula='$cedula'");
-    $grupo_row = $grupo_result->fetch_assoc();
-    $grupo = $grupo_row['grupo'];
+
+    $info_usuario = $conexion->query("SELECT grupo, fecha_acceso_aulas, fecha_inicio_zoom, hora_clases, profesor FROM usuarios WHERE cedula='$cedula'")->fetch_assoc();
+    $grupo = $info_usuario['grupo'];
+    $fecha_acceso = $info_usuario['fecha_acceso_aulas'];
+    $fecha_zoom = $info_usuario['fecha_inicio_zoom'];
+    $hora_clases = $info_usuario['hora_clases'];
+    $profesor = $info_usuario['profesor'];
     ?>
     <!DOCTYPE html>
     <html lang="es">
@@ -109,6 +111,13 @@ if ($usuario && $usuario['link_whatsapp_id'] && $usuario['link_moodle_id']) {
             <p><em>Recuerda cambiar tu contraseña en tu primer inicio de sesión.</em></p>
             <p>Tu grupo es: <strong><?= $grupo ?></strong></p>
             <p><a href="<?= $moodle_link ?>" target="_blank">Entrar a Moodle</a></p>
+
+            <!-- Información adicional -->
+            <p>Fecha de acceso a las aulas: <strong><?= $fecha_acceso ?></strong></p>
+            <p>Inicio de clases por Zoom: <strong><?= $fecha_zoom ?></strong></p>
+            <p>Hora de clases: <strong><?= $hora_clases ?></strong></p>
+            <p>Profesor asignado: <strong><?= $profesor ?></strong></p>
+
             <p>Para más información visita nuestra página web: 
                 <a href="https://superarse.edu.ec/" target="_blank">Instituto Superarse</a></p>
         </div>
@@ -119,4 +128,3 @@ if ($usuario && $usuario['link_whatsapp_id'] && $usuario['link_moodle_id']) {
     echo "<p>No se encontraron los links asignados para este usuario.</p>";
 }
 ?>
-
