@@ -27,6 +27,7 @@ if ($usuario && $usuario['link_whatsapp_id'] && $usuario['link_moodle_id']) {
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Registro exitoso - Instituto Superarse</title>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
         <style>
             body {
                 font-family: Arial, sans-serif;
@@ -67,10 +68,28 @@ if ($usuario && $usuario['link_whatsapp_id'] && $usuario['link_moodle_id']) {
                 color: #005D52;
                 font-weight: bold;
                 text-decoration: none;
+                display: inline-block;
+                transition: transform 0.3s ease;
+            }
+
+            .boton {
+                display: inline-block;
+                padding: 10px 20px;
+                font-size: 16px;
+                color: white;
+                background-color: #005D52;
+                text-decoration: none;
+                border-radius: 5px;
+                text-align: center;
+            }
+
+            .boton:hover {
+                background-color: #0056b3;
             }
 
             a:hover {
                 text-decoration: underline;
+                transform: scale(1.1) translateY(-5px)
             }
 
             strong {
@@ -105,12 +124,12 @@ if ($usuario && $usuario['link_whatsapp_id'] && $usuario['link_moodle_id']) {
     <body>
         <div class="container">
             <h2>¡Registro completado exitosamente!</h2>
-            <p><a href="<?= $whatsapp_link ?>" target="_blank">Entrar al grupo de WhatsApp</a></p>
+            <p><a href="<?= $whatsapp_link ?>" target="_blank" class="boton"><i class="bi bi-whatsapp"></i> Entrar al grupo de WhatsApp <i class="bi bi-whatsapp"></i></a></p>
             <p>Tu usuario para ingresar al Aula Virtual es: <strong><?= $cedula ?></strong></p>
             <p>Tu contraseña temporal es: <strong>Superarse.2025</strong></p>
             <p><em>Recuerda cambiar tu contraseña en tu primer inicio de sesión.</em></p>
             <p>Tu grupo es: <strong><?= $grupo ?></strong></p>
-            <p><a href="<?= $moodle_link ?>" target="_blank">Entrar a Moodle</a></p>
+            <p><a href="<?= $moodle_link ?>" target="_blank" class="boton">Entrar a Moodle</a></p>
 
             <!-- Información adicional -->
             <p>Fecha de acceso a las aulas: <strong><?= $fecha_acceso ?></strong></p>
@@ -120,6 +139,10 @@ if ($usuario && $usuario['link_whatsapp_id'] && $usuario['link_moodle_id']) {
 
             <p>Para más información visita nuestra página web: 
                 <a href="https://superarse.edu.ec/" target="_blank">Instituto Superarse</a></p>
+
+            <video autoplay loop src="assets/videos/becaIngles.mp4" width="50%" height="75%" autoplay loop playsinline></video>
+
+            <p>Siguenos en nuestro Tiktok <a href="https://www.tiktok.com/@becasuperarse"><i class="bi bi-tiktok"></i> @becasuperarse <i class="bi bi-tiktok"></i></a></p>
         </div>
     </body>
     </html>
