@@ -137,12 +137,18 @@ if ($usuario && $usuario['link_whatsapp_id'] && $usuario['link_moodle_id']) {
             <p>Hora de clases: <strong><?= $hora_clases ?></strong></p>
             <p>Profesor asignado: <strong><?= $profesor ?></strong></p>
 
-            <p>Para más información visita nuestra página web: 
-                <a href="https://superarse.edu.ec/" target="_blank">Instituto Superarse</a></p>
+            <p>Para más información visita nuestra página web:<br> 
+                <a href="https://superarse.edu.ec/" target="_blank" class="boton">Instituto Superarse</a></p>
 
-            <video autoplay loop src="assets/videos/becaIngles.mp4" width="50%" height="75%" autoplay loop playsinline></video>
+            <video src="assets/videos/becaIngles.mp4" width="50%" height="75%" autoplay playsinline controls></video>
 
-            <p>Siguenos en nuestro Tiktok <a href="https://www.tiktok.com/@becasuperarse"><i class="bi bi-tiktok"></i> @becasuperarse <i class="bi bi-tiktok"></i></a></p>
+            <p>Siguenos en nuestro Tiktok <br><a href="https://www.tiktok.com/@becasuperarse" target="_blank" class="boton"><i class="bi bi-tiktok"></i> @becasuperarse <i class="bi bi-tiktok"></i></a></p>
+            <br>
+            <p><h2>Tutorial de ingreso a Moodle</h2></p>
+            <video loop src="assets/videos/tutorialMoodle.mp4" width="50%" height="75%" controls></video>
+            <br>
+            <p><h2>Tutorial de ingreso a Zoom</h2></p>
+            <video loop src="assets/videos/tutorialZoom.mp4" width="50%" height="75%" controls></video>
         </div>
     </body>
     </html>
