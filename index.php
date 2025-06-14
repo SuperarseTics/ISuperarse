@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -21,7 +22,8 @@
             align-items: center;
         }
 
-        h1, h3 {
+        h1,
+        h3 {
             color: black;
             text-align: center;
             margin: 20px 10px 0;
@@ -96,7 +98,10 @@
         }
 
         @media (max-width: 600px) {
-            h1, h2, h3 {
+
+            h1,
+            h2,
+            h3 {
                 font-size: 1.2em;
             }
 
@@ -115,7 +120,7 @@
             width: 100%;
             height: 100%;
             overflow: auto;
-            background-color: rgba(0,0,0,0.7);
+            background-color: rgba(0, 0, 0, 0.7);
         }
 
         .modal-content {
@@ -137,8 +142,21 @@
             font-size: 24px;
             cursor: pointer;
         }
+
+        .footer-container {
+            width: 100%;
+            padding: 10px 0;
+            margin-top: auto;
+        }
+
+        .footer-container footer {
+            text-align: center;
+            color: #000;
+            font-size: 0.9em;
+        }
     </style>
 </head>
+
 <body>
 
     <h1>Instituto Superior Tecnológico Superarse</h1>
@@ -170,33 +188,47 @@
     </div>
 
     <script>
-    document.getElementById("buscar-form").addEventListener("submit", function(e) {
-        e.preventDefault();
-        const cedula = document.getElementById("cedula").value;
+        document.getElementById("buscar-form").addEventListener("submit", function(e) {
+            e.preventDefault();
+            const cedula = document.getElementById("cedula").value;
 
-        fetch("buscar.php", {
-            method: "POST",
-            headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body: "cedula=" + encodeURIComponent(cedula)
-        })
-        .then(response => response.text())
-        .then(html => {
-            if (html.includes("modal-form-content")) {
-                document.getElementById("modal-body").innerHTML = html;
-                document.getElementById("modal").style.display = "block";
-            } else {
-                document.body.innerHTML = html; // Redirige si es necesario
+            // Validaci籀n de la c矇dula (debe tener 10 d穩gitos)
+            if (!/^\d{10}$/.test(cedula)) {
+                alert("Por favor, ingresa una c矇dula v獺lida de 10 d穩gitos.");
+                return;
+            }
+
+            fetch("buscar.php", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded"
+                    },
+                    body: "cedula=" + encodeURIComponent(cedula)
+                })
+                .then(response => response.text())
+                .then(html => {
+                    if (html.includes("modal-form-content")) {
+                        document.getElementById("modal-body").innerHTML = html;
+                        document.getElementById("modal").style.display = "block";
+                    } else {
+                        document.body.innerHTML = html; // Redirige si es necesario
+                    }
+                });
+        });
+
+        // Cerrar el modal
+        document.addEventListener("click", function(e) {
+            if (e.target.matches(".close") || e.target.matches(".modal")) {
+                document.getElementById("modal").style.display = "none";
             }
         });
-    });
-
-    // Cerrar el modal
-    document.addEventListener("click", function(e) {
-        if (e.target.matches(".close") || e.target.matches(".modal")) {
-            document.getElementById("modal").style.display = "none";
-        }
-    });
     </script>
+    <div class="footer-container">
+        <footer>
+            Diseñado por Instituto Superarse. Todos los derechos reservados.
+        </footer>
+    </div>
 
 </body>
+
 </html>

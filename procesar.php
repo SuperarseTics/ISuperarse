@@ -1,25 +1,48 @@
 <?php
 include "conexion.php";
 
-$cedula = $_POST['cedula'];
-$ciudad = $_POST['ciudad'];
-$provincia = $_POST['provincia'];
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+$cedula = $_POST['cedula'] ?? '';
+$ciudad = $_POST['ciudad'] ?? '';
+$provincia = $_POST['provincia'] ?? '';
+
+if (!$cedula || !$ciudad || !$provincia) {
+    die("Faltan datos requeridos.");
+}
 
 // 1. Obtiene los links ya asignados al usuario
-$usuario = $conexion->query("SELECT link_whatsapp_id, link_moodle_id FROM usuarios WHERE cedula = '$cedula'")->fetch_assoc();
+$stmt = $pdo->prepare("SELECT link_whatsapp_id, link_moodle_id FROM usuarios WHERE cedula = ?");
+$stmt->execute([$cedula]);
+$usuario = $stmt->fetch();
 
 if ($usuario && $usuario['link_whatsapp_id'] && $usuario['link_moodle_id']) {
-    $conexion->query("UPDATE usuarios SET ciudad='$ciudad', provincia='$provincia' WHERE cedula='$cedula'");
+    // 2. Actualiza ciudad y provincia
+    $stmt = $pdo->prepare("UPDATE usuarios SET ciudad = ?, provincia = ? WHERE cedula = ?");
+    $stmt->execute([$ciudad, $provincia, $cedula]);
 
-    $whatsapp_link = $conexion->query("SELECT enlace FROM links_whatsapp WHERE id={$usuario['link_whatsapp_id']}")->fetch_assoc()['enlace'];
-    $moodle_link = $conexion->query("SELECT enlace FROM links_moodle WHERE id={$usuario['link_moodle_id']}")->fetch_assoc()['enlace'];
+    // 3. Obtiene los enlaces
+    $stmt = $pdo->prepare("SELECT enlace FROM links_whatsapp WHERE id = ?");
+    $stmt->execute([$usuario['link_whatsapp_id']]);
+    $whatsapp_link = $stmt->fetchColumn();
 
-    $info_usuario = $conexion->query("SELECT grupo, fecha_acceso_aulas, fecha_inicio_zoom, hora_clases, profesor FROM usuarios WHERE cedula='$cedula'")->fetch_assoc();
+    $stmt = $pdo->prepare("SELECT enlace FROM links_moodle WHERE id = ?");
+    $stmt->execute([$usuario['link_moodle_id']]);
+    $moodle_link = $stmt->fetchColumn();
+
+    // 4. Obtiene informaci籀n adicional del usuario
+    $stmt = $pdo->prepare("SELECT grupo, fecha_acceso_aulas, fecha_inicio_zoom, hora_clases, profesor,contrasenia FROM usuarios WHERE cedula = ?");
+    $stmt->execute([$cedula]);
+    $info_usuario = $stmt->fetch();
+
     $grupo = $info_usuario['grupo'];
-    $fecha_acceso = $info_usuario['fecha_acceso_aulas'];
-    $fecha_zoom = $info_usuario['fecha_inicio_zoom'];
+    $fecha_acceso_aulas = $info_usuario['fecha_acceso_aulas'];
+    $fecha_inicio_zoom = $info_usuario['fecha_inicio_zoom'];
     $hora_clases = $info_usuario['hora_clases'];
     $profesor = $info_usuario['profesor'];
+    $contrasenia = $info_usuario['contrasenia'];
     ?>
     <!DOCTYPE html>
     <html lang="es">
@@ -71,7 +94,7 @@ if ($usuario && $usuario['link_whatsapp_id'] && $usuario['link_moodle_id']) {
                 display: inline-block;
                 transition: transform 0.3s ease;
             }
-
+            
             .boton {
                 display: inline-block;
                 padding: 10px 20px;
@@ -125,21 +148,25 @@ if ($usuario && $usuario['link_whatsapp_id'] && $usuario['link_moodle_id']) {
         <div class="container">
             <h2>¡Registro completado exitosamente!</h2>
             <p><a href="<?= $whatsapp_link ?>" target="_blank" class="boton"><i class="bi bi-whatsapp"></i> Entrar al grupo de WhatsApp <i class="bi bi-whatsapp"></i></a></p>
-            <p>Tu usuario para ingresar al Aula Virtual es: <strong><?= $cedula ?></strong></p>
-            <p>Tu contraseña temporal es: <strong>Superarse.2025</strong></p>
-            <p><em>Recuerda cambiar tu contraseña en tu primer inicio de sesión.</em></p>
-            <p>Tu grupo es: <strong><?= $grupo ?></strong></p>
+            <p>Tu usuario para ingresar al Aula Virtual es: <strong><?= htmlspecialchars($cedula) ?></strong></p>
+            <p>Tu contraseña es: <strong><?= htmlspecialchars($contrasenia) ?></strong></p>
+            <p><em>En algunas ocasiones, el sistema solicitará que cambies tu contraseña por motivos de seguridad. Si no es el caso, puedes continuar utilizando la misma contraseña que se te proporcionó inicialmente.</em></p>
+            <p>Tu grupo es: <strong><?= htmlspecialchars($grupo) ?></strong></p>
             <p><a href="<?= $moodle_link ?>" target="_blank" class="boton">Entrar a Moodle</a></p>
 
-            <!-- Información adicional -->
-            <p>Fecha de acceso a las aulas: <strong><?= $fecha_acceso ?></strong></p>
-            <p>Inicio de clases por Zoom: <strong><?= $fecha_zoom ?></strong></p>
-            <p>Hora de clases: <strong><?= $hora_clases ?></strong></p>
-            <p>Profesor asignado: <strong><?= $profesor ?></strong></p>
+            <hr>
 
-            <p>Para más información visita nuestra página web:<br> 
+            <p><strong>Fecha de acceso a aulas:</strong> <?= htmlspecialchars($fecha_acceso_aulas) ?></p>
+            <p><strong>Fecha de inicio en Zoom:</strong> <?= htmlspecialchars($fecha_inicio_zoom) ?></p>
+            <p><strong>Horario de clases:</strong> <?= htmlspecialchars($hora_clases) ?></p>
+            <p><em>Recuerda que las clases se imparten una vez por semana.</em></p>
+            <p><strong>Profesor/a asignado/a:</strong> <?= htmlspecialchars($profesor) ?></p>
+
+            <hr>
+
+            <p>Para más información visita nuestra página web: <br>
                 <a href="https://superarse.edu.ec/" target="_blank" class="boton">Instituto Superarse</a></p>
-
+                
             <video src="assets/videos/becaIngles.mp4" width="50%" height="75%" autoplay playsinline controls></video>
 
             <p>Siguenos en nuestro Tiktok <br><a href="https://www.tiktok.com/@becasuperarse" target="_blank" class="boton"><i class="bi bi-tiktok"></i> @becasuperarse <i class="bi bi-tiktok"></i></a></p>
@@ -157,3 +184,4 @@ if ($usuario && $usuario['link_whatsapp_id'] && $usuario['link_moodle_id']) {
     echo "<p>No se encontraron los links asignados para este usuario.</p>";
 }
 ?>
+
